@@ -1,17 +1,18 @@
 'use client';
 
-import { SubmitDataType } from './InputForm';
+import { SubmitDataType } from '@/type/SubmitData';
+import { useCallback } from 'react';
 
 export default function ViewDockerFile({ Datus }: { Datus: SubmitDataType }) {
-  const FROM_OS = ({ OS }: { OS: SubmitDataType['OS'] }) => {
+  const FROM_OS = useCallback(({ OS }: { OS: SubmitDataType['OS'] }) => {
     return (
       <pre>
         <code>FROM {OS !== null ? (OS as string) : ('' as string)}:latest</code>
       </pre>
     );
-  };
+  },[Datus.OS])
 
-  const Install_Lang = ({ Lang }: { Lang: SubmitDataType['Lang'] }) => {
+  const Install_Lang = useCallback(({ Lang }: { Lang: SubmitDataType['Lang'] }) => {
     if (Lang === 'Rust') {
       return (
         <>
@@ -43,9 +44,9 @@ export default function ViewDockerFile({ Datus }: { Datus: SubmitDataType }) {
       );
     }
     return <></>;
-  };
+  },[Datus.Lang])
 
-  const Install_PackageManager = ({
+  const Install_PackageManager = useCallback(({
     PackageManager,
   }: {
     PackageManager: SubmitDataType['PackageManager'];
@@ -80,9 +81,9 @@ export default function ViewDockerFile({ Datus }: { Datus: SubmitDataType }) {
       );
     }
     return <br />;
-  };
+  },[Datus.PackageManager])
 
-  const SetupFrameWork = ({
+  const SetupFrameWork = useCallback(({
     FrameWork,
     PackageManager,
     Language,
@@ -111,7 +112,7 @@ export default function ViewDockerFile({ Datus }: { Datus: SubmitDataType }) {
       );
     }
     return <br />;
-  };
+  },[Datus.FrameWork])
 
   const CopyButton = () => {
     return (

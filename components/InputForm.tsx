@@ -1,92 +1,65 @@
 'use client';
-import { Dispatch, SetStateAction, useMemo, useRef, useState } from 'react';
+import { RefObject, useCallback, useRef, useState} from 'react';
 import ViewDockerFile from './ViewDockerfileResult';
+import { SubmitDataType } from '@/type/SubmitData';
+import { SelectOS, SelectLangs, SelectFrameWork, SelectPackageManager, Selector } from '@/type/SubmitContent';
 
-export type SubmitDataType = {
-  OS: 'ubuntu' | null | symbol;
-  Lang: 'TypeScript' | 'Rust' | null | symbol;
-  FrameWork: 'Next.js' | null | symbol;
-  PackageManager: 'npm' | 'yarn' | 'bun' | 'cargo' | symbol | null;
-};
 
-function Form({
-  setProperty,
-}: {
-  setProperty: Dispatch<SetStateAction<SubmitDataType | undefined>>;
-}) {
-  const OSRef = useRef<SubmitDataType['OS']>('ubuntu');
-  const LangRef = useRef<SubmitDataType['Lang']>('TypeScript');
-  const FrameWorkRef = useRef<SubmitDataType['FrameWork']>('Next.js');
-  const PackageManagerRef = useRef<SubmitDataType['PackageManager']>('npm');
+export function Form() {
+  const [Property, setProperty] = useState<SubmitDataType>({
+    OS: 'ubuntu',
+    Lang: 'Rust',
+    FrameWork: "Next.js",
+    PackageManager: 'cargo',
+  });
+  const OSRef = useRef<HTMLSelectElement>(null);
+  const LangRef = useRef<HTMLSelectElement>(null);
+  const FrameWorkRef = useRef<HTMLSelectElement>(null);
+  const PackageManagerRef = useRef<HTMLSelectElement>(null);
   const RefLists = [OSRef, LangRef, FrameWorkRef, PackageManagerRef];
 
-  type Selector = {
-    LabelText: string;
-    SelectItem: string[];
-  };
-  const SelectOS: Selector = {
-    LabelText: 'Select OS',
-    SelectItem: ['Ubuntu'],
-  };
-  const SelectLangs: Selector = {
-    LabelText: 'Select Develop Language',
-    SelectItem: ['Rust', 'TypeScript'],
-  };
-  const SelectFrameWork: Selector = {
-    LabelText: 'Select Use FrameWork',
-    SelectItem: ['Next.js'],
-  };
-  const SelectPackageManager: Selector = {
-    LabelText: 'Use Package Manager',
-    SelectItem: ['npm', 'yarn', 'bun'],
-  };
-
-  const SelectorComp = ({
+  const SelectorComp = useCallback(({
     Genre,
     SelectorObj,
-    Ref,
+    Ref
   }: {
     Genre: string;
     SelectorObj: Selector;
-    Ref: any;
+    Ref: RefObject<HTMLSelectElement>
   }) => {
+    const OptionElems  = SelectorObj.SelectItem.map((item, index) => {
+      return (
+        <option key={index} id={`${Genre}-${item}`} value={item}>
+          {item}
+        </option>
+      )
+    })
     return (
       <>
         <label className="label">
           <span className="label-text">{SelectorObj.LabelText}</span>
         </label>
         <select className="select" name={Genre} ref={Ref}>
-          {SelectorObj.SelectItem.map((item, index) => {
-            return (
-              <option key={index} id={`${Genre}-${item}`} value={item}>
-                {item}
-              </option>
-            );
-          })}
+          {OptionElems.map((elem) => {return elem})}
         </select>
       </>
     );
-  };
+  },[])
 
   return (
     <>
       <form
         className="form-control w-full max-w-xs flex flex-row"
-        action={
-          (/* formData: FormData */) => {
-            /* const SelectOS = formData.get('OS') as string;
-          const SelectLang = formData.get('LG') as string;
-          const SelectFrameWork = formData.get('FW') as string;
-          const SelectPackagemanager = formData.get('PM') as string; */
-            const Result: SubmitDataType = {
-              OS: OSRef.current,
-              Lang: LangRef.current,
-              FrameWork: FrameWorkRef.current,
-              PackageManager: PackageManagerRef.current,
-            };
-            setProperty(Result);
-          }
-        }
+        onSubmit={(event) => {
+          event.preventDefault()
+          const Result: SubmitDataType = {
+            OS: OSRef.current?.value as SubmitDataType["OS"],
+            Lang: LangRef.current?.value as SubmitDataType["Lang"],
+            FrameWork: FrameWorkRef.current?.value as SubmitDataType["FrameWork"],
+            PackageManager: PackageManagerRef.current?.value as SubmitDataType["PackageManager"],
+          };
+          setProperty(Result);
+        }}
       >
         {[SelectOS, SelectLangs, SelectFrameWork, SelectPackageManager].map(
           (SelectorItem, index) => {
@@ -96,35 +69,14 @@ function Form({
                 <SelectorComp
                   SelectorObj={SelectorItem}
                   Genre={Genres[index]}
-                  Ref={RefLists[index]}
-                />
+                  Ref={RefLists[index]}/>
               </span>
             );
           }
         )}
         <input type="submit" className="btn" value="生成" />
       </form>
+      <ViewDockerFile Datus={Property as SubmitDataType} />
     </>
   );
-}
-export default function ReturnData() {
-  const [Property, setProperty] = useState<SubmitDataType | undefined>({
-    OS: 'ubuntu',
-    Lang: 'Rust',
-    FrameWork: null,
-    PackageManager: 'cargo',
-  });
-  return useMemo(() => {
-    return (
-      <>
-        <Form setProperty={setProperty} />
-        <ViewDockerFile Datus={Property as SubmitDataType} />
-      </>
-    );
-  }, [
-    Property!.OS,
-    Property!.Lang,
-    Property!.FrameWork,
-    Property!.PackageManager,
-  ]);
 }
