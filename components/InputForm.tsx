@@ -29,7 +29,16 @@ export function Form() {
   }) => {
     const OptionElems  = SelectorObj.SelectItem.map((item, index) => {
       return (
-        <option key={index} id={`${Genre}-${item}`} value={item}>
+        <option key={index} id={`${Genre}-${item}`} value={item}
+        onChange={() => {
+          const Result: SubmitDataType = {
+            OS: OSRef.current?.value as SubmitDataType["OS"],
+            Lang: LangRef.current?.value as SubmitDataType["Lang"],
+            FrameWork: FrameWorkRef.current?.value as SubmitDataType["FrameWork"],
+            PackageManager: PackageManagerRef.current?.value as SubmitDataType["PackageManager"],
+          };
+          setProperty(Result);
+        }}>
           {item}
         </option>
       )
@@ -50,7 +59,7 @@ export function Form() {
     <>
       <form
         className="form-control w-full max-w-xs flex flex-row"
-        onSubmit={(event) => {
+        /*onSubmit={(event) => {
           event.preventDefault()
           const Result: SubmitDataType = {
             OS: OSRef.current?.value as SubmitDataType["OS"],
@@ -59,7 +68,7 @@ export function Form() {
             PackageManager: PackageManagerRef.current?.value as SubmitDataType["PackageManager"],
           };
           setProperty(Result);
-        }}
+        }}*/
       >
         {[SelectOS, SelectLangs, SelectFrameWork, SelectPackageManager].map(
           (SelectorItem, index) => {
@@ -74,7 +83,7 @@ export function Form() {
             );
           }
         )}
-        <input type="submit" className="btn" value="生成" />
+        {/*<input type="submit" className="btn" value="生成" />*/}
       </form>
       <ViewDockerFile Datus={Property as SubmitDataType} />
     </>
